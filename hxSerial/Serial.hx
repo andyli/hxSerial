@@ -22,7 +22,7 @@ class Serial {
 
 	public function setup():Bool {
 		this.handle = _setup(portName,baud);
-		isSetup = handle != null;
+		isSetup = handle != null && handle != 0;
 		return isSetup;
 	}
 

@@ -14,6 +14,7 @@
 	#include <getopt.h>
 	#include <dirent.h>
 #else
+	#pragma comment(lib, "setupapi.lib")
 	#include <winbase.h>
 	#include <tchar.h>
 	#include <iostream>
@@ -21,7 +22,7 @@
 	#include <setupapi.h>
 	#include <regstr.h>
 	#define MAX_SERIAL_PORTS 256
-	 #include <winioctl.h>
+	#include <winioctl.h>
 	#ifdef __MINGW32__
 			#define INITGUID
 			#include <initguid.h> // needed for dev-c++ & DEFINE_GUID
@@ -51,7 +52,7 @@ bool 		bPortsEnumerated = false;
 DEFINE_GUID (GUID_SERENUM_BUS_ENUMERATOR, 0x4D36E978, 0xE325, 0x11CE, 0xBF, 0xC1, 0x08, 0x00, 0x2B, 0xE1, 0x03, 0x18);
 //------------------------------------
 
-void ofSerial::enumerateWin32Ports(){
+void enumerateWin32Ports(){
 	if (bPortsEnumerated == true) return;
 
 	for (int i = 0; i < MAX_SERIAL_PORTS; i++){
@@ -193,17 +194,16 @@ value enumerateDevices() {
 
 		enumerateWin32Ports();
 		for (int i = 0; i < nPorts; i++){
-			char* name = portNamesFriendly[i];
+			char* name = portNamesShort[i];
 			int len0 = strlen(str);
 			int len1 = strlen(name);
 			char* nstr = (char*)malloc(len0 + len1 + 7);
 			strcpy(nstr,str);
-			strcat(nstr,"/dev/");
 			strcat(nstr,name);
 			strcat(nstr,"\n");
 			if (strlen(str) > 0) free(str);
 			str = nstr;
-		}
+		} 
 
 	//---------------------------------------------
     #endif
@@ -292,7 +292,7 @@ value setup(value a, value b) {
 	// open the serial port:
 	// "COM4", etc...
 
-	int hComm=CreateFileA(portName.c_str(),GENERIC_READ|GENERIC_WRITE,0,0,
+	HANDLE hComm=CreateFileA(portName,GENERIC_READ|GENERIC_WRITE,0,0,
 					OPEN_EXISTING,0,0);
 
 	if(hComm==INVALID_HANDLE_VALUE){
@@ -341,8 +341,8 @@ value setup(value a, value b) {
 	tOut.ReadTotalTimeoutMultiplier=0;
 	tOut.ReadTotalTimeoutConstant=0;
 	SetCommTimeouts(hComm,&tOut);
-
-	return hComm;
+	
+	return alloc_int((int)hComm);
 	//---------------------------------------------
 	#endif
 	//---------------------------------------------
@@ -363,7 +363,7 @@ value writeBytes(value a, value b, value c) {
     //---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD written;
-		WriteFile(fd, buffer, length, &written,0);
+		WriteFile((HANDLE)fd, buffer, length, &written,0);
 		return alloc_int((int)written);
 	#endif
 	//---------------------------------------------
@@ -386,7 +386,7 @@ value readBytes(value a, value b) {
     //---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD nRead = 0;
-		if (!ReadFile(fd,buffer,length,&nRead,0)){
+		if (!ReadFile((HANDLE)fd,buffer,length,&nRead,0)){
 			return alloc_null();
 		}
 	#endif
@@ -411,7 +411,7 @@ value writeByte(value a, value b) {
     //---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD written = 0;
-		if(!WriteFile(fd, tmpByte, 1, &written,0)){
+		if(!WriteFile((HANDLE)fd, &buffer, 1, &written,0)){
 			 return alloc_null();
 		}
 
@@ -436,7 +436,7 @@ value readByte(value a) {
     //---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD nRead;
-		if (!ReadFile(fd, tmpByte, 1, &nRead, 0)){
+		if (!ReadFile((HANDLE)fd, buffer, 1, &nRead, 0)){
 			return alloc_null();
 		}
 	#endif
@@ -471,7 +471,7 @@ value flush(value a,value b,value c){
 		else if(flushOut) flushType = PURGE_TXCLEAR;
 		else return alloc_null();
 
-		PurgeComm(fd, flushType);
+		PurgeComm((HANDLE)fd, flushType);
 	#endif
 	//---------------------------------------------
 	
@@ -480,10 +480,11 @@ value flush(value a,value b,value c){
 DEFINE_PRIM(flush,3);
 
 value available(value a){
+	int fd = val_int(a);
+	int numBytes = 0;
+	
 	//---------------------------------------------
 	#if defined( TARGET_OSX ) || defined( TARGET_LINUX )
-		int fd = val_int(a);
-		int numBytes = 0;
 		ioctl(fd,FIONREAD,&numBytes);
 	#endif
     //---------------------------------------------
@@ -492,8 +493,8 @@ value available(value a){
 	#ifdef TARGET_WIN32
 		COMSTAT stat;
        	DWORD err;
-       	if(fd!=INVALID_HANDLE_VALUE){
-           if(!ClearCommError(fd, &err, &stat)){
+       	if(fd!=(int)INVALID_HANDLE_VALUE){
+           if(!ClearCommError((HANDLE)fd, &err, &stat)){
                numBytes = 0;
            } else {
                numBytes = stat.cbInQue;
@@ -513,7 +514,7 @@ value breakdown(value a){
 	//---------------------------------------------
 	#ifdef TARGET_WIN32
 	//---------------------------------------------
-		CloseHandle(fd);
+		CloseHandle((HANDLE)fd);
 	//---------------------------------------------
     #else
     //---------------------------------------------
