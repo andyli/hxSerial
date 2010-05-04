@@ -7,7 +7,7 @@ class Test extends haxe.unit.TestCase{
 		trace("start testing...");
 		trace(Serial.getDeviceList());
 		
-		var s = new Serial("COM7",true);
+		var s = new Serial("/dev/tty.usbserial-A4001tkb",true);
 		this.assertTrue(s.isSetup);
 		cpp.Sys.sleep(2);
 		
