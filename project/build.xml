@@ -1,0 +1,21 @@
+<xml>
+	<include name="${HXCPP}/build-tool/BuildCommon.xml"/>
+
+	<files id="files">
+		<compilerflag value = "-Iinclude"/>
+		<compilerflag value = "-DTARGET_OSX" if="macos"/>
+		<compilerflag value = "-DTARGET_LINUX" if="linux"/>
+		<compilerflag value = "-DTARGET_WIN32" if="windows"/>
+		<file name="serial.cpp"/>
+	</files>
+
+	<target id="hxSerial.ndll" tool="linker" toolid="dll" output="hxSerial">
+		<files id="files"/>
+		<ext value=".ndll"/>
+		<outdir name="../ndll/${BINDIR}"/>
+	</target>
+
+	<target id="default">
+		<target id="hxSerial.ndll"/>
+	</target>
+</xml>

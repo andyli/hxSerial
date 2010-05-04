@@ -1,0 +1,10 @@
+-cmd cd project
+-cmd haxelib run hxcpp build.xml
+-cmd cd ..
+-cmd cp ndll/Mac/hxSerial.ndll bin/hxSerial.ndll 
+
+-cpp bin
+-main Test
+
+-cmd cd bin
+-cmd ./Test
