@@ -1,0 +1,6 @@
+<project name="hxSerial" url="http://github.com/andyli/hxSerial" license="BSD">
+    <user name="andyli"/>
+    <tag v="cross"/>
+    <description>Serial communication for haXe/C++.</description>
+    <version name="0.1.0">First release.</version>
+</project>
