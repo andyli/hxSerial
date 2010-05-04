@@ -1,0 +1,9 @@
+h1. hxSerial
+
+*hxSerial* is a library for serial communication in "haXe":http://haxe.org (C++ target). It is based on ofSerial in "OpenFrameworks":http://www.openframeworks.cc/.
+
+h2. change log
+
+h3. version 0.1.0
+
+First release. Working on Windows/Mac/Linux.
