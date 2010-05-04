@@ -12,6 +12,7 @@
 	#include <termios.h>
 	#include <sys/ioctl.h>
 	#include <getopt.h>
+	#include <unistd.h>
 	#include <dirent.h>
 #else
 	#pragma comment(lib, "setupapi.lib")
@@ -247,15 +248,19 @@ value setup(value a, value b) {
 	   case 9600: 	cfsetispeed(&options,B9600);
 					cfsetospeed(&options,B9600);
 					break;
+		#ifdef TARGET_OSX
 	   case 14400: 	cfsetispeed(&options,B14400);
 					cfsetospeed(&options,B14400);
 					break;
+		#endif
 	   case 19200: 	cfsetispeed(&options,B19200);
 					cfsetospeed(&options,B19200);
 					break;
+		#ifdef TARGET_OSX
 	   case 28800: 	cfsetispeed(&options,B28800);
 					cfsetospeed(&options,B28800);
 					break;
+		#endif
 	   case 38400: 	cfsetispeed(&options,B38400);
 					cfsetospeed(&options,B38400);
 					break;

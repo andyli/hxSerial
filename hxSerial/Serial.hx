@@ -11,7 +11,7 @@ class Serial {
 	
 	public function new(portName:String, ?baud:Int = 9600, ?setupImmediately:Bool = false){
 		isSetup = false;
-
+		
 		this.portName = portName;
 		this.baud = baud;
 		
@@ -22,7 +22,7 @@ class Serial {
 
 	public function setup():Bool {
 		this.handle = _setup(portName,baud);
-		isSetup = handle != null && handle != 0;
+		isSetup = handle != null && handle > 0;
 		return isSetup;
 	}
 
