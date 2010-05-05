@@ -6,4 +6,4 @@ h2. change log
 
 h3. version 0.1.0
 
-First release. Working on Windows/Mac/Linux.
+First release. Supports Windows/Mac/Linux.
