@@ -1,8 +1,19 @@
 package hxSerial;
 
+#if neko
+import neko.Lib;
+#elseif cpp
+import cpp.Lib;
+#end
+
 class Serial {
 	static public function getDeviceList():Array<String> {
-		return cast(_enumerateDevices(),String).split('\n');
+		#if neko
+		var str:String = neko.NativeString.toString(_enumerateDevices());
+		#else
+		var str:String = _enumerateDevices();
+		#end
+		return str == null ? [] : str.split('\n');
 	}
 
 	public var portName(default,null):String;
@@ -31,7 +42,11 @@ class Serial {
 	}
 
 	public function readBytes(length:Int):String {
+		#if neko
+		return neko.NativeString.toString(_readBytes(handle,length));
+		#else
 		return _readBytes(handle,length);
+		#end
 	}
 
 	public function writeByte(byte:Int):Bool {
@@ -57,13 +72,13 @@ class Serial {
 	
 	private var handle:Int;
 
-	private static var _enumerateDevices = cpp.Lib.load("hxSerial","enumerateDevices",0);
-	private static var _setup = cpp.Lib.load("hxSerial","setup",2);
-	private static var _writeBytes = cpp.Lib.load("hxSerial","writeBytes",3);
-	private static var _readBytes = cpp.Lib.load("hxSerial","readBytes",2);
-	private static var _writeByte = cpp.Lib.load("hxSerial","writeByte",2);
-	private static var _readByte = cpp.Lib.load("hxSerial","readByte",1);
-	private static var _flush = cpp.Lib.load("hxSerial","flush",3);
-	private static var _available = cpp.Lib.load("hxSerial","available",1);
-	private static var _breakdown = cpp.Lib.load("hxSerial","breakdown",1);
+	private static var _enumerateDevices = Lib.load("hxSerial","enumerateDevices",0);
+	private static var _setup = Lib.load("hxSerial","setup",2);
+	private static var _writeBytes = Lib.load("hxSerial","writeBytes",3);
+	private static var _readBytes = Lib.load("hxSerial","readBytes",2);
+	private static var _writeByte = Lib.load("hxSerial","writeByte",2);
+	private static var _readByte = Lib.load("hxSerial","readByte",1);
+	private static var _flush = Lib.load("hxSerial","flush",3);
+	private static var _available = Lib.load("hxSerial","available",1);
+	private static var _breakdown = Lib.load("hxSerial","breakdown",1);
 }

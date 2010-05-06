@@ -212,7 +212,9 @@ value enumerateDevices() {
 
 
     if (strlen(str) > 0) str[strlen(str)-1] = '\0';
-	return alloc_string(str);
+    value ret = alloc_string(str);
+    free(str);
+	return ret;
 }
 DEFINE_PRIM(enumerateDevices,0);
 
@@ -398,7 +400,9 @@ value readBytes(value a, value b) {
 	//---------------------------------------------
 
 	buffer[length] = '\0';
-	return alloc_string(buffer);
+	value ret = alloc_string(buffer);
+	free(buffer);
+	return ret;
 }
 DEFINE_PRIM(readBytes,2);
 
@@ -428,7 +432,7 @@ DEFINE_PRIM(writeByte,2);
 
 value readByte(value a) {
 	int fd = val_int(a);
-	char * buffer = (char*) malloc(2);
+	char buffer[2];
 
 	//---------------------------------------------
 	#if defined( TARGET_OSX ) || defined( TARGET_LINUX )
