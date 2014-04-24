@@ -1,11 +1,7 @@
 import hxSerial.Serial;
 
 import haxe.io.BytesOutput;
-#if neko
-import neko.Sys;
-#elseif cpp
-import cpp.Sys;
-#end
+import Sys;
 
 class Test extends haxe.unit.TestCase{
 	public function test():Void {

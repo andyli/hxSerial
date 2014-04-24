@@ -1,4 +1,5 @@
 #define IMPLEMENT_API
+#define NEKO_COMPATIBLE
 
 #include <hx/CFFI.h>
 
@@ -122,7 +123,8 @@ void enumerateWin32Ports(){
 //---------------------------------------------
 
 value enumerateDevices() {
-	char* str = "";
+   char empty = 0;
+	char* str = &empty;
 	
 	//---------------------------------------------
 	#if defined( TARGET_OSX )
@@ -147,7 +149,7 @@ value enumerateDevices() {
 					strcat(nstr,"/dev/");
 					strcat(nstr,name);
 					strcat(nstr,"\n");
-					if (strlen(str) > 0) free(str);
+					if (str != &empty) free(str);
 					str = nstr;
 				}
 			}
@@ -179,7 +181,7 @@ value enumerateDevices() {
 					strcat(nstr,"/dev/");
 					strcat(nstr,name);
 					strcat(nstr,"\n");
-					if (strlen(str) > 0) free(str);
+					if (str != &empty ) free(str);
 					str = nstr;
 				}
 			}
@@ -202,7 +204,7 @@ value enumerateDevices() {
 			strcpy(nstr,str);
 			strcat(nstr,name);
 			strcat(nstr,"\n");
-			if (strlen(str) > 0) free(str);
+			if (str != &empty) free(str);
 			str = nstr;
 		} 
 
@@ -213,7 +215,7 @@ value enumerateDevices() {
 
     if (strlen(str) > 0) str[strlen(str)-1] = '\0';
     value ret = alloc_string(str);
-    free(str);
+	 if (str != &empty) free(str);
 	return ret;
 }
 DEFINE_PRIM(enumerateDevices,0);
