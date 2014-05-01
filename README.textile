@@ -2,13 +2,16 @@ h1. hxSerial
 
 *hxSerial* is a library for serial communication in "haXe":http://haxe.org (C++/Neko target). It is based on ofSerial in "OpenFrameworks":http://www.openframeworks.cc/.
 
+This is a fork of "andyLi/hxSerial":http://github.com/andyli/hxSerial
+
 h2. Download and Install
 
 The most easy and proper way is from haxelib:
 
 @haxelib install hxSerial@
 
-Or you can download/checkout the source from "the github repo":http://github.com/andyli/hxSerial.
+Or you can download/checkout the source from "the github repo":http://github.com/AlexHaxe/hxSerial.
+
 
 h2. How to use
 
