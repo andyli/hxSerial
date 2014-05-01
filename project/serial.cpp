@@ -95,7 +95,7 @@ void enumerateWin32Ports(){
 
             char *   begin    = NULL;
             char *   end    = NULL;
-            begin          = strstr((char *)dataBuf, "COM");
+            begin          = strstr((char *)dataBuf, "(COM");
 
 
             if (begin)
@@ -104,7 +104,7 @@ void enumerateWin32Ports(){
                 if (end)
                     {
                       *end = 0;   // get rid of the )...
-                      strcpy(portNamesShort[nPorts], begin);
+                      strcpy(portNamesShort[nPorts], begin + 1);
                 }
                 if (nPorts++ > MAX_SERIAL_PORTS)
                         break;
@@ -279,11 +279,16 @@ value setup(value a, value b) {
 	}
 
 	options.c_cflag |= (CLOCAL | CREAD);
-	options.c_cflag &= ~PARENB;
+	options.c_cflag &= ~(PARENB | PARODD);
 	options.c_cflag &= ~CSTOPB;
+	options.c_cflag &= ~CRTSCTS;
 	options.c_cflag &= ~CSIZE;
 	options.c_cflag |= CS8;
-	tcsetattr(fd,TCSANOW,&options);
+
+	if (tcsetattr(fd,TCSANOW,&options) != 0)
+	{
+		return alloc_null();
+	}
 
     return alloc_int(fd);
 
@@ -299,8 +304,8 @@ value setup(value a, value b) {
 	// open the serial port:
 	// "COM4", etc...
 
-	HANDLE hComm=CreateFileA(portName,GENERIC_READ|GENERIC_WRITE,0,0,
-					OPEN_EXISTING,0,0);
+	HANDLE hComm=CreateFile(portName,GENERIC_READ|GENERIC_WRITE,0,NULL,
+					OPEN_EXISTING,0,NULL);
 
 	if(hComm==INVALID_HANDLE_VALUE){
 		return alloc_null();
