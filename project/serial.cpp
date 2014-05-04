@@ -171,7 +171,7 @@ value enumerateDevices() {
 		} else {
 			while ((entry = readdir(dir)) != NULL){
 				char* name = entry->d_name;
-				if (strncmp(name,"ttyS",4) == 0 || strncmp(name,"ttyUSB",6) == 0 || strncmp(name,"rfc",3) == 0) {
+				if (strncmp(name,"ttyS",4) == 0 || strncmp(name,"ttyUSB",6) == 0 || strncmp(name,"ttyACM",6) == 0 || strncmp(name,"rfc",3) == 0) {
 					int len0 = strlen(str);
 					int len1 = strlen(name);
 					char* nstr = (char*)malloc(len0 + len1 + 7);

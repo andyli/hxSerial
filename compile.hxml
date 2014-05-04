@@ -3,7 +3,5 @@
 -main Test
 -lib hxSerial
 
--cmd cd bin
-#-cmd Test.exe
-#-cmd ./Test
--cmd neko Test
+# -cmd cd bin
+# -cmd neko Test
