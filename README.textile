@@ -2,26 +2,23 @@ h1. hxSerial
 
 *hxSerial* is a library for serial communication in "haXe":http://haxe.org (C++/Neko target). It is based on ofSerial in "OpenFrameworks":http://www.openframeworks.cc/.
 
-This is a fork of "andyLi/hxSerial":http://github.com/andyli/hxSerial
-
 h2. Download and Install
 
 The most easy and proper way is from haxelib:
 
-@haxelib git hxSerial https://github.com/AlexHaxe/hxSerial.git@
+@haxelib install hxSerial@
 
-Or you can download/checkout the source from "the github repo":http://github.com/AlexHaxe/hxSerial.
-
+Or you can download/checkout the source from "the github repo":http://github.com/andyli/hxSerial.
 
 h2. How to use
 
 Create a @Serial@ object, given its device name and speed(in bits per second, ie.baud):
 
-@var serialObj = new hxSerial.Serial("/dev/ttyACM0",9600);@
+@var serialObj = new hxSerial.Serial("/dev/tty.usbserial-A4001tkb",9600);@
 
 The device name above is something you will get in Mac. For Windows, it should be something like "COM7". For Linux(Ubuntu), it should be similar to "/dev/ttyUSB0".
 
-You can check the device names by @trace (hxSerial.Serial.getDeviceList ())@.
+You can check the device names by @trace(hxSerial.Serial.getDeviceList())@.
 
 You can then read/write to the device using the readByte(s)/writeByte(s) method.
 
@@ -29,19 +26,13 @@ You can then read/write to the device using the readByte(s)/writeByte(s) method.
 
 h3. Writing
 
-For writing, @writeByte ()@ returns @true@ if the operation is successful. @writeBytes ()@ returns the number of bytes it writes.
+For writing, @writeByte()@ returns @true@ if the operation is successful. @writeBytes()@ returns the number of bytes it writes.
 
 h3. Reading
 
-For reading, you first check the number of bytes arrived by calling @available ()@. If the amount of bytes you needed is enough, call @readByte ()@ to get a single byte as @Int@ or call @readBytes ()@ to get multiple bytes as @String@.
+For reading, you first check the number of bytes arrived by calling @available()@. If the amount of bytes you needed is enough, call @readByte()@ to get a single byte as @Int@ or call @readBytes()@ to get multiple bytes as @String@.
 
 h2. change log
-
-h3. version 0.2.0
-
-Forked
-Haxe 3.x compatibility
-Support for COM10 and above on Windows
 
 h3. version 0.1.1
 
