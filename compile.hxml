@@ -1,7 +1,5 @@
-#-cpp bin
--neko bin/Test.n
--main Test
+main Test
 -lib hxSerial
 
-# -cmd cd bin
-# -cmd neko Test
+-cmd cd bin
+-cmd neko Test
