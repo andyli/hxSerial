@@ -1,7 +1,3 @@
-import Sys;
-
-import haxe.io.BytesOutput;
-
 import hxSerial.Serial;
 
 class Test extends haxe.unit.TestCase{
