@@ -70,7 +70,7 @@ class Serial {
 		return _breakdown(handle);
 	}
 	
-	private var handle:Int;
+	private var handle:Null<Int>;
 
 	private static var _enumerateDevices = Lib.load("hxSerial","enumerateDevices",0);
 	private static var _setup = Lib.load("hxSerial","setup",2);
