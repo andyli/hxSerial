@@ -1,9 +1,2 @@
-#-cpp bin
--neko bin/Test.n
--main Test
--lib hxSerial
-
--cmd cd bin
-#-cmd Test.exe
-#-cmd ./Test
--cmd neko Test
+--next compile-cpp.hxml
+--next compile-neko.hxml
