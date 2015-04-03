@@ -16,21 +16,22 @@ install:
   - haxelib list
 
 script:
-  - cd project
+  - cd $TRAVIS_BUILD_DIR/project
   - haxelib run hxcpp build.xml
   - haxelib run hxcpp build.xml -DHXCPP_M64
-  - cd ..
+  - cd $TRAVIS_BUILD_DIR
   - haxelib dev hxSerial .
   - haxe compile.hxml -D HXCPP_M64
   - cp -f ndll/Linux64/* bin
-  - cd bin
+  - cd $TRAVIS_BUILD_DIR/bin
   - ./Test
   - neko Test.n
-  - cd ..
+  - cd $TRAVIS_BUILD_DIR
   - haxe compile-cpp.hxml
   - cp -f ndll/Linux/* bin
-  - cd bin
+  - cd $TRAVIS_BUILD_DIR/bin
   - ./Test
 
 after_success:
+  - cd $TRAVIS_BUILD_DIR
   - if [[ $TRAVIS_TAG = v[0-9]* ]]; then zip haxelib.zip -r haxelib.json README.md hxSerial ndll && haxelib submit haxelib.zip <<< $HAXELIB_PW; fi;
