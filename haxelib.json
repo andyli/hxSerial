@@ -1,0 +1,13 @@
+{
+	"name": "hxSerial",
+	"license": "BSD",
+	"tags": ["serial","hardware","cpp","neko"],
+	"description": "hxSerial is a library for serial port communication in Haxe (C++/Neko target).",
+	"contributors": ["andyli"],
+	"releasenote": "Fixes for haxe 3.1.3 and hxcpp 3.1.39.",
+	"version": "0.1.2",
+	"url": "http://github.com/andyli/hxSerial",
+	"dependencies": {
+
+	}
+}

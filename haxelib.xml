@@ -1,9 +1,0 @@
-<project name="hxSerial" url="http://github.com/andyli/hxSerial" license="BSD">
-    <user name="andyli"/>
-    <tag v="serial"/>
-    <tag v="hardware"/>
-    <tag v="cpp"/>
-    <tag v="neko"/>
-    <description>hxSerial is a library for serial port communication in haXe (C++/Neko target).</description>
-    <version name="0.1.1">Fixed memory leak and added Neko support.</version>
-</project>
