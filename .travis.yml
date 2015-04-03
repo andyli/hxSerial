@@ -1,5 +1,9 @@
 language: cpp
 
+env:
+  global:
+    secure: ZY3KJVjJ2sibLxxrxJOQUOlUMAlg30xipU1gKNvmcvyR2lCLaapB/tXzzoxqqixqE2b00mz5OYM3C0KtSmNy1j/Ss8ctNGPIMMpUz3vRfWjyyakIk/txJ4QZkMvB6SyTzZ6NQfg5TmOQOZSMuroyAIwgzUs2urTtc43FueTjdho=
+
 install:
   - sudo apt-get update
   - sudo apt-get install python-software-properties -y # for the next command
@@ -27,3 +31,6 @@ script:
   - cp -f ndll/Linux/* bin
   - cd bin
   - ./Test
+
+after_success:
+  - if [[ $TRAVIS_TAG = v[0-9]* ]]; then zip haxelib.zip -r haxelib.json README.md hxSerial ndll && haxelib submit haxelib.zip <<< $HAXELIB_PW; fi;
