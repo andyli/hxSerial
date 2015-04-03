@@ -1,0 +1,22 @@
+language: cpp
+
+install:
+  - sudo apt-get update
+  - sudo apt-get install python-software-properties -y # for the next command
+  - sudo add-apt-repository ppa:eyecreate/haxe -y
+  - sudo apt-get update
+  - sudo apt-get install haxe -y
+  - sudo apt-get install gcc-multilib g++-multilib -y  # for hxcpp
+  - mkdir ~/haxelib && haxelib setup ~/haxelib
+  - haxelib install hxcpp 3.1.39 > log.txt || cat log.txt
+  - haxelib list
+
+script:
+  - cd project
+  - haxelib run hxcpp build.xml
+  - haxelib run hxcpp build.xml -DHXCPP_M64
+  - cd ..
+  - haxelib dev hxSerial .
+  - haxe compile.hxml
+  - bin/Test
+  - neko bin/Test.n

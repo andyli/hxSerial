@@ -8,25 +8,27 @@ import cpp.Lib;
 
 class Serial {
 	static public function getDeviceList():Array<String> {
-      init();
+		init();
 		var str:String = _enumerateDevices();
 		return str == null ? [] : str.split('\n');
 	}
 
-   public static function init()
-   {
-      if (!isInit)
-      {
-         isInit = true;
-         var initNeko =  Lib.loadLazy("hxSerial","neko_init",5);
-         if (initNeko != null) 
-             initNeko(function(s) return new String(s),
-                      function(len:Int) { var r = []; if (len > 0) r[len - 1] = null; return r; },
-                      null, true, false);
-         else
-            trace("Could not init neko api for hxSerial");
-      }
-   }
+	public static function init()
+	{
+		if (!isInit)
+		{
+			isInit = true;
+			var initNeko = Lib.loadLazy("hxSerial","neko_init",5);
+			if (initNeko != null) 
+				initNeko(
+					function(s) return new String(s),
+					function(len:Int) { var r = []; if (len > 0) r[len - 1] = null; return r; },
+					null, true, false
+				);
+			else
+				trace("Could not init neko api for hxSerial");
+		}
+	}
 
 	public var portName(default,null):String;
 	public var baud(default,null):Int;
@@ -34,7 +36,7 @@ class Serial {
 	
 	public function new(portName:String, ?baud:Int = 9600, ?setupImmediately:Bool = false){
 		isSetup = false;
-      init();
+		init();
 		
 		this.portName = portName;
 		this.baud = baud;
@@ -84,7 +86,7 @@ class Serial {
 	}
 	
 	private var handle:Null<Int>;
-   private static var isInit = #if neko false #else true #end ;
+	private static var isInit = #if neko false #else true #end ;
 
 	private static var _enumerateDevices = Lib.load("hxSerial","enumerateDevices",0);
 	private static var _setup = Lib.load("hxSerial","setup",2);

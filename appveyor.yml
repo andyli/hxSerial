@@ -1,0 +1,24 @@
+version: "{build}"
+
+environment:
+    global:
+        HAXELIB_ROOT: C:\projects\haxelib
+
+install:
+    - cinst haxe -y
+    - RefreshEnv
+    - mkdir "%HAXELIB_ROOT%"
+    - haxelib setup "%HAXELIB_ROOT%"
+    - haxelib install hxcpp 3.1.39 > log.txt || type log.txt
+    - haxelib list
+
+build_script:
+    - cd project
+    - haxelib run hxcpp build.xml
+    - cd ..
+    - haxelib dev hxSerial .
+    - haxe compile.hxml
+
+test_script:
+    - bin\Test.exe
+    - neko bin\Test.n
