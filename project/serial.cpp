@@ -1,4 +1,5 @@
 #define IMPLEMENT_API
+#define NEKO_COMPATIBLE
 
 #include <hx/CFFI.h>
 
@@ -25,9 +26,9 @@
 	#define MAX_SERIAL_PORTS 256
 	#include <winioctl.h>
 	#ifdef __MINGW32__
-			#define INITGUID
-			#include <initguid.h> // needed for dev-c++ & DEFINE_GUID
-    #endif
+		#define INITGUID
+		#include <initguid.h> // needed for dev-c++ & DEFINE_GUID
+	#endif
 #endif
 
 #include <stdio.h>
@@ -42,8 +43,8 @@
 #ifdef TARGET_WIN32
 //---------------------------------------------
 
-char 		** portNamesShort = new char * [MAX_SERIAL_PORTS];
-char 		** portNamesFriendly = new char * [MAX_SERIAL_PORTS];
+char**		portNamesShort = new char * [MAX_SERIAL_PORTS];
+char**		portNamesFriendly = new char * [MAX_SERIAL_PORTS];
 int	 		nPorts = 0;
 bool 		bPortsEnumerated = false;
 
@@ -72,57 +73,56 @@ void enumerateWin32Ports(){
 	// Search device set
 	hDevInfo = SetupDiGetClassDevs((struct _GUID *)&GUID_SERENUM_BUS_ENUMERATOR,0,0,DIGCF_PRESENT);
 	if ( hDevInfo ){
-      while (TRUE){
-         ZeroMemory(&DeviceInterfaceData, sizeof(DeviceInterfaceData));
-         DeviceInterfaceData.cbSize = sizeof(DeviceInterfaceData);
-         if (!SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInterfaceData)){
-             // SetupDiEnumDeviceInfo failed
-             break;
-         }
+		while (TRUE){
+			ZeroMemory(&DeviceInterfaceData, sizeof(DeviceInterfaceData));
+			DeviceInterfaceData.cbSize = sizeof(DeviceInterfaceData);
+			if (!SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInterfaceData)){
+				// SetupDiEnumDeviceInfo failed
+				break;
+			}
 
-         if (SetupDiGetDeviceRegistryProperty(hDevInfo,
-             &DeviceInterfaceData,
-             SPDRP_FRIENDLYNAME,
-             &dataType,
-             dataBuf,
-             sizeof(dataBuf),
-             &actualSize)){
+			if (SetupDiGetDeviceRegistryProperty(hDevInfo,
+				&DeviceInterfaceData,
+				SPDRP_FRIENDLYNAME,
+				&dataType,
+				dataBuf,
+				sizeof(dataBuf),
+				&actualSize)){
 
-			sprintf(portNamesFriendly[nPorts], "%s", dataBuf);
-			portNamesShort[nPorts][0] = 0;
+				sprintf(portNamesFriendly[nPorts], "%s", dataBuf);
+				portNamesShort[nPorts][0] = 0;
 
-			// turn blahblahblah(COM4) into COM4
+				// turn blahblahblah(COM4) into COM4
 
-            char *   begin    = NULL;
-            char *   end    = NULL;
-            begin          = strstr((char *)dataBuf, "(COM");
+				char * begin = NULL;
+				char * end = NULL;
+				begin = strstr((char *)dataBuf, "(COM");
 
 
-            if (begin)
-                {
-                end          = strstr(begin, ")");
-                if (end)
-                    {
-                      *end = 0;   // get rid of the )...
-                      strcpy(portNamesShort[nPorts], begin + 1);
-                }
-                if (nPorts++ > MAX_SERIAL_PORTS)
-                        break;
-            }
-         }
-            i++;
-      }
-   }
-   SetupDiDestroyDeviceInfoList(hDevInfo);
+				if (begin) {
+					end = strstr(begin, ")");
+					if (end) {
+						*end = 0;   // get rid of the )...
+						strcpy(portNamesShort[nPorts], begin + 1);
+					}
+					if (nPorts++ > MAX_SERIAL_PORTS)
+						break;
+				}
+			}
+			i++;
+		}
+	}
+	SetupDiDestroyDeviceInfoList(hDevInfo);
 
-   bPortsEnumerated = false;
+	bPortsEnumerated = false;
 }
 //---------------------------------------------
 #endif
 //---------------------------------------------
 
 value enumerateDevices() {
-	char* str = "";
+	char empty = 0;
+	char* str = &empty;
 	
 	//---------------------------------------------
 	#if defined( TARGET_OSX )
@@ -147,14 +147,14 @@ value enumerateDevices() {
 					strcat(nstr,"/dev/");
 					strcat(nstr,name);
 					strcat(nstr,"\n");
-					if (strlen(str) > 0) free(str);
+					if (str != &empty) free(str);
 					str = nstr;
 				}
 			}
 		}
 	//---------------------------------------------
-    #endif
-    //---------------------------------------------
+	#endif
+	//---------------------------------------------
 
 	//---------------------------------------------
 	#if defined( TARGET_LINUX )
@@ -179,7 +179,7 @@ value enumerateDevices() {
 					strcat(nstr,"/dev/");
 					strcat(nstr,name);
 					strcat(nstr,"\n");
-					if (strlen(str) > 0) free(str);
+					if (str != &empty ) free(str);
 					str = nstr;
 				}
 			}
@@ -202,18 +202,18 @@ value enumerateDevices() {
 			strcpy(nstr,str);
 			strcat(nstr,name);
 			strcat(nstr,"\n");
-			if (strlen(str) > 0) free(str);
+			if (str != &empty) free(str);
 			str = nstr;
 		} 
 
 	//---------------------------------------------
-    #endif
-    //---------------------------------------------
+	#endif
+	//---------------------------------------------
 
 
-    if (strlen(str) > 0) str[strlen(str)-1] = '\0';
-    value ret = alloc_string(str);
-    free(str);
+	if (strlen(str) > 0) str[strlen(str)-1] = '\0';
+	value ret = alloc_string(str);
+	if (str != &empty) free(str);
 	return ret;
 }
 DEFINE_PRIM(enumerateDevices,0);
@@ -235,47 +235,58 @@ value setup(value a, value b) {
 	tcgetattr(fd,&oldoptions);
 	options = oldoptions;
 	switch(baud){
-	   case 300: 	cfsetispeed(&options,B300);
-					cfsetospeed(&options,B300);
-					break;
-	   case 1200: 	cfsetispeed(&options,B1200);
-					cfsetospeed(&options,B1200);
-					break;
-	   case 2400: 	cfsetispeed(&options,B2400);
-					cfsetospeed(&options,B2400);
-					break;
-	   case 4800: 	cfsetispeed(&options,B4800);
-					cfsetospeed(&options,B4800);
-					break;
-	   case 9600: 	cfsetispeed(&options,B9600);
-					cfsetospeed(&options,B9600);
-					break;
+		case 300:
+			cfsetispeed(&options,B300);
+			cfsetospeed(&options,B300);
+			break;
+		case 1200:
+			cfsetispeed(&options,B1200);
+			cfsetospeed(&options,B1200);
+			break;
+		case 2400:
+			cfsetispeed(&options,B2400);
+			cfsetospeed(&options,B2400);
+			break;
+		case 4800:
+			cfsetispeed(&options,B4800);
+			cfsetospeed(&options,B4800);
+			break;
+		case 9600:
+			cfsetispeed(&options,B9600);
+			cfsetospeed(&options,B9600);
+			break;
 		#ifdef TARGET_OSX
-	   case 14400: 	cfsetispeed(&options,B14400);
-					cfsetospeed(&options,B14400);
-					break;
+		case 14400:
+			cfsetispeed(&options,B14400);
+			cfsetospeed(&options,B14400);
+			break;
 		#endif
-	   case 19200: 	cfsetispeed(&options,B19200);
-					cfsetospeed(&options,B19200);
-					break;
+		case 19200:
+			cfsetispeed(&options,B19200);
+			cfsetospeed(&options,B19200);
+			break;
 		#ifdef TARGET_OSX
-	   case 28800: 	cfsetispeed(&options,B28800);
-					cfsetospeed(&options,B28800);
-					break;
+		case 28800:
+			cfsetispeed(&options,B28800);
+			cfsetospeed(&options,B28800);
+			break;
 		#endif
-	   case 38400: 	cfsetispeed(&options,B38400);
-					cfsetospeed(&options,B38400);
-					break;
-	   case 57600:  cfsetispeed(&options,B57600);
-					cfsetospeed(&options,B57600);
-					break;
-	   case 115200: cfsetispeed(&options,B115200);
-					cfsetospeed(&options,B115200);
-					break;
-
-		default:	cfsetispeed(&options,B9600);
-					cfsetospeed(&options,B9600);
-					break;
+		case 38400:
+			cfsetispeed(&options,B38400);
+			cfsetospeed(&options,B38400);
+			break;
+		case 57600:
+			cfsetispeed(&options,B57600);
+			cfsetospeed(&options,B57600);
+			break;
+		case 115200:
+			cfsetispeed(&options,B115200);
+			cfsetospeed(&options,B115200);
+			break;
+		default:
+			cfsetispeed(&options,B9600);
+			cfsetospeed(&options,B9600);
+			break;
 	}
 
 	options.c_cflag |= (CLOCAL | CREAD);
@@ -290,22 +301,29 @@ value setup(value a, value b) {
 		return alloc_null();
 	}
 
-    return alloc_int(fd);
+	return alloc_int(fd);
 
-    //---------------------------------------------
-    #endif
-    //---------------------------------------------
+	//---------------------------------------------
+	#endif
+	//---------------------------------------------
 
 
-    //---------------------------------------------
+	//---------------------------------------------
 	#ifdef TARGET_WIN32
 	//---------------------------------------------
 
 	// open the serial port:
 	// "COM4", etc...
 
-	HANDLE hComm=CreateFile(portName,GENERIC_READ|GENERIC_WRITE,0,NULL,
-					OPEN_EXISTING,0,NULL);
+	HANDLE hComm = CreateFile(
+		portName,
+		GENERIC_READ|GENERIC_WRITE,
+		0,
+		NULL,
+		OPEN_EXISTING,
+		0,
+		NULL
+	);
 
 	if(hComm==INVALID_HANDLE_VALUE){
 		return alloc_null();
@@ -369,10 +387,10 @@ value writeBytes(value a, value b, value c) {
 	//---------------------------------------------
 	#if defined( TARGET_OSX ) || defined( TARGET_LINUX )
 		return alloc_int(write(fd, buffer, length));
-    #endif
-    //---------------------------------------------
+	#endif
+	//---------------------------------------------
 
-    //---------------------------------------------
+	//---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD written;
 		WriteFile((HANDLE)fd, buffer, length, &written,0);
@@ -392,10 +410,10 @@ value readBytes(value a, value b) {
 		if(read(fd, buffer, length) < 0){
 			return alloc_null();
 		}
-    #endif
-    //---------------------------------------------
+	#endif
+	//---------------------------------------------
 
-    //---------------------------------------------
+	//---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD nRead = 0;
 		if (!ReadFile((HANDLE)fd,buffer,length,&nRead,0)){
@@ -419,14 +437,14 @@ value writeByte(value a, value b) {
 	//---------------------------------------------
 	#if defined( TARGET_OSX ) || defined( TARGET_LINUX )
 		return alloc_bool(write(fd, &buffer, 1) > 0);
-    #endif
-    //---------------------------------------------
+	#endif
+	//---------------------------------------------
 
-    //---------------------------------------------
+	//---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD written = 0;
 		if(!WriteFile((HANDLE)fd, &buffer, 1, &written,0)){
-			 return alloc_null();
+			return alloc_null();
 		}
 
 		return alloc_bool((int)written > 0);
@@ -445,9 +463,9 @@ value readByte(value a) {
 			return alloc_null();
 		}
 	#endif
-    //---------------------------------------------
+	//---------------------------------------------
 
-    //---------------------------------------------
+	//---------------------------------------------
 	#ifdef TARGET_WIN32
 		DWORD nRead;
 		if (!ReadFile((HANDLE)fd, buffer, 1, &nRead, 0)){
@@ -457,7 +475,7 @@ value readByte(value a) {
 	//---------------------------------------------
 	
 	buffer[1] = '\0';
-    return alloc_int(buffer[0]);
+	return alloc_int(buffer[0]);
 }
 DEFINE_PRIM(readByte,1);
 
@@ -476,9 +494,9 @@ value flush(value a,value b,value c){
 
 		tcflush(fd, flushType);
 	#endif
-    //---------------------------------------------
+	//---------------------------------------------
 
-    //---------------------------------------------
+	//---------------------------------------------
 	#ifdef TARGET_WIN32
 		if( flushIn && flushOut) flushType = PURGE_TXCLEAR | PURGE_RXCLEAR;
 		else if(flushIn) flushType = PURGE_RXCLEAR;
@@ -501,24 +519,24 @@ value available(value a){
 	#if defined( TARGET_OSX ) || defined( TARGET_LINUX )
 		ioctl(fd,FIONREAD,&numBytes);
 	#endif
-    //---------------------------------------------
+	//---------------------------------------------
 
-    //---------------------------------------------
+	//---------------------------------------------
 	#ifdef TARGET_WIN32
 		COMSTAT stat;
-       	DWORD err;
-       	if(fd!=(int)INVALID_HANDLE_VALUE){
-           if(!ClearCommError((HANDLE)fd, &err, &stat)){
-               numBytes = 0;
-           } else {
-               numBytes = stat.cbInQue;
-           }
-       	} else {
-           numBytes = 0;
-       	}
+		DWORD err;
+		if(fd!=(int)INVALID_HANDLE_VALUE){
+			if(!ClearCommError((HANDLE)fd, &err, &stat)){
+				numBytes = 0;
+			} else {
+				numBytes = stat.cbInQue;
+			}
+		} else {
+			numBytes = 0;
+		}
 	#endif
-    //---------------------------------------------
-    
+	//---------------------------------------------
+	
 	return alloc_int(numBytes);
 }
 DEFINE_PRIM(available,1);
@@ -530,12 +548,12 @@ value breakdown(value a){
 	//---------------------------------------------
 		CloseHandle((HANDLE)fd);
 	//---------------------------------------------
-    #else
-    //---------------------------------------------
+	#else
+	//---------------------------------------------
 		::close(fd);
-    	//---------------------------------------------
-    #endif
-    //---------------------------------------------
+		//---------------------------------------------
+	#endif
+	//---------------------------------------------
 	return alloc_null();
 }
 DEFINE_PRIM(breakdown,1);
