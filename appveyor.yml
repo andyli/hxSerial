@@ -20,5 +20,7 @@ build_script:
     - haxe compile.hxml
 
 test_script:
-    - bin\Test.exe
-    - neko bin\Test.n
+    - copy /y ndll\Windows\* bin
+    - cd bin
+    - Test.exe
+    - neko Test.n

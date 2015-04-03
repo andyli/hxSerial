@@ -17,6 +17,13 @@ script:
   - haxelib run hxcpp build.xml -DHXCPP_M64
   - cd ..
   - haxelib dev hxSerial .
-  - haxe compile.hxml
-  - bin/Test
-  - neko bin/Test.n
+  - haxe compile.hxml -D HXCPP_M64
+  - cp -f ndll/Linux64/* bin
+  - cd bin
+  - ./Test
+  - neko Test.n
+  - cd ..
+  - haxe compile-cpp.hxml
+  - cp -f ndll/Linux/* bin
+  - cd bin
+  - ./Test
